@@ -11,7 +11,9 @@ import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 
@@ -20,7 +22,8 @@ import org.springframework.context.event.EventListener
             FlywayAutoConfiguration::class,
             XADataSourceAutoConfiguration::class,
             JacksonAutoConfiguration::class,
-            SpringDataWebAutoConfiguration::class
+            SpringDataWebAutoConfiguration::class,
+            ErrorMvcAutoConfiguration::class
         ],
         scanBasePackageClasses = [
             Main::class,

@@ -8,8 +8,8 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "\"user\"", schema = PUBLIC_SCHEMA_NAME)
-class DbUser : BaseEntity() {
+@Table(name = "\"session\"", schema = PUBLIC_SCHEMA_NAME)
+class DbSession : BaseEntity() {
 
     @Id
     @Column(name = "id", updatable = false)
@@ -18,20 +18,13 @@ class DbUser : BaseEntity() {
     var id: UUID = DbHelper.EMPTY_ID
         protected set
 
-    @Column(name = "email")
-    lateinit var email: String
+    @Column(name = "token")
+    lateinit var token: String
 
-    @Column(name = "first_name")
-    lateinit var firstName: String
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    lateinit var user: DbUser
 
-    @Column(name = "last_name")
-    lateinit var lastName: String
-
-    @Column(name = "password")
-    lateinit var password: String
-
-    val fullName: String
-        get() {
-            return "$lastName, $firstName"
-        }
+    @Column(name = "user_id", insertable = false, updatable = false)
+    lateinit var userId: UUID
 }

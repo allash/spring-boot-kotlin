@@ -15,11 +15,17 @@ class FixtureLoaderImpl @Autowired constructor(
     @Transactional(rollbackFor = [Throwable::class], readOnly = false)
     override fun load() {
 
-        fixtures.createUser(
+        val user = fixtures.createUser(
                 firstName = "John",
                 lastName = "Doe",
                 email = "john.doe@mail.com",
                 password = "asdf"
         )
+
+        fixtures.createSession(user)
+
+        (0..50).forEach { _ ->
+            fixtures.createActivity(user = user)
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.home.piperbike
 
+import java.util.*
+
 class Extensions
 
 /**
@@ -19,3 +21,7 @@ inline fun <T, R> T.tryCatch(block: (T) -> R, catchException: (Throwable) -> R):
  * @return The result of `block` if no error occurs. `null` otherwise.
  */
 inline fun <T, R> T.tryOrNull(block: (T) -> R): R? = this.tryCatch(block) { null }
+
+fun UUID.removeHyphens(): String {
+    return this.toString().replace("-", "")
+}

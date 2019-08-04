@@ -1,4 +1,4 @@
-package com.home.piperbike.db.entities
+package com.home.piperbike.db
 
 import java.util.*
 

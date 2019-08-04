@@ -1,4 +1,4 @@
-package com.home.piperbike.helpers
+package com.home.piperbike.helper
 
 import com.home.piperbike.tryCatch
 import org.springframework.security.crypto.bcrypt.BCrypt
