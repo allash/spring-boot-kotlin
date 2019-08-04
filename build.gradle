@@ -1,0 +1,172 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+import java.nio.file.Files
+import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
+
+buildscript {
+    ext {
+        kotlinVersion = '1.3.31'
+        springBootVersion = '2.1.5.RELEASE'
+        springSecurityVersion = '5.1.5.RELEASE'
+        hibernateVersion = '5.1.0.Final'
+        swaggerVersion = '2.9.2'
+        jacksonVersion = '2.9.9'
+        mockitoVersion = '2.28.2'
+        jooqVersion = '3.11.11'
+        postgresDriverVersion = '42.2.5.jre7'
+        flywayVersion = '5.2.4'
+        apachePoiVersion = '4.1.0'
+        reflectionsVersion = '0.9.11'
+        jedisVersion = '2.10.2' // 3.x is not compatible with spring
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://repo.spring.io/plugins-release' }
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+
+    dependencies {
+        classpath group: "io.spring.gradle", name: "propdeps-plugin", version: "0.0.9.RELEASE"
+        classpath group: "org.springframework.boot", name: "spring-boot-gradle-plugin", version: springBootVersion
+        classpath group: "org.jetbrains.kotlin", name: 'kotlin-allopen', version: kotlinVersion
+        classpath group: "org.jetbrains.kotlin", name: "kotlin-gradle-plugin", version: kotlinVersion
+        classpath group: "se.transmode.gradle", name: "gradle-docker", version: "1.2"
+        classpath group: "no.nils", name: "wsdl2java", version: "0.10"
+        classpath group: "org.owasp", name: "dependency-check-gradle", version: "3.3.0"
+        classpath group: "com.github.ben-manes", name: "gradle-versions-plugin", version: "0.20.0"
+    }
+}
+
+group 'io.e-complete.app'
+version '0.1.0'
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-idea'
+apply plugin: 'docker'
+apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'com.github.ben-manes.versions'
+
+
+jar {
+    archivesBaseName = 'piperbike-server'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://repo.spring.io/plugins-release' }
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlinVersion
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlinVersion
+
+    optional group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: springBootVersion
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-properties-migrator', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: springBootVersion
+
+    compile group: 'redis.clients', name: 'jedis', version: jedisVersion
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: springSecurityVersion
+    compile group: 'org.jooq', name: 'jooq', version: jooqVersion
+    compile group: 'org.postgresql', name: 'postgresql', version: postgresDriverVersion
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: swaggerVersion
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: jacksonVersion
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
+    compile group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
+    compile group: 'org.apache.poi', name: 'poi', version: apachePoiVersion
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: apachePoiVersion
+    compile group: 'org.bouncycastle', name: 'bcmail-jdk16', version: '1.46'
+    compile group: 'org.bouncycastle', name: 'bctsp-jdk16', version: '1.46'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
+    compile group: 'org.reflections', name: 'reflections', version: reflectionsVersion
+    compile group: 'org.hibernate', name: 'hibernate-java8', version: hibernateVersion
+
+    compile group: 'org.json', name: 'json', version: '20180813' // Spring boot 2.1.5.RELEASE is missing this dep, might be removable with a later version
+
+    compile group: 'com.github.javafaker', name: 'javafaker', version: '0.18'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testCompile group: 'org.springframework.security', name: 'spring-security-test', version: springSecurityVersion
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0' // 3.12.x has a different API
+    testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+}
+
+compileJava.dependsOn(processResources)
+
+configurations {
+    //all*.exclude group: 'joda-time' //maybe required by aws later
+    all*.exclude group: 'com.vaadin.external.google', module: 'android-json'
+}
+
+configurations.getByName("testCompile") {
+    resolutionStrategy {
+        force "org.mockito:mockito-core:$mockitoVersion"
+    }
+}
+
+sourceSets {
+    generated.java {
+        srcDir "src/generated"
+    }
+    main.java.srcDirs += generated.java.srcDirs
+}
+
+allprojects {
+    compileKotlin {
+        kotlinOptions.allWarningsAsErrors = true
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+    compileTestKotlin {
+        kotlinOptions.allWarningsAsErrors = true
+        kotlinOptions.jvmTarget = "1.8"
+    }
+}
+
+allOpen {
+    annotation("javax.persistence.Entity")
+    annotation("javax.persistence.MappedSuperclass")
+    annotation("javax.persistence.Embeddable")
+}
+
+springBoot {
+    mainClassName = "net.home.piperbike.MainKt"
+}
+
+bootJar {
+    exclude("**/com/home/dev/**")
+}
+
+task resolveAllDependencies {
+    doLast {
+        println("Resolve buildscript")
+        buildscript.configurations.all {
+            if (it.canBeResolved) it.resolve()
+        }
+        configurations.all {
+            if (it.canBeResolved) it.resolve()
+        }
+    }
+}
+
