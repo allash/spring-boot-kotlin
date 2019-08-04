@@ -9,4 +9,6 @@ import java.util.*
 @Repository
 interface SessionRepository :
         JpaRepository<DbSession, UUID>,
-        JpaSpecificationExecutor<DbSession>
+        JpaSpecificationExecutor<DbSession> {
+    fun findOneByToken(token: String): DbSession?
+}

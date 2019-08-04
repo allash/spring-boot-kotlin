@@ -2,6 +2,7 @@ package com.home.piperbike.api.auth
 
 import com.home.piperbike.api.auth.dto.request.DtoLoginRequest
 import com.home.piperbike.api.auth.dto.response.DtoLoginResponse
+import com.home.piperbike.api.shared.exception.user.InvalidPasswordException
 import com.home.piperbike.api.shared.exception.user.UserNotFoundByEmailException
 import com.home.piperbike.db.entities.DbSession
 import com.home.piperbike.db.repositories.SessionRepository
@@ -25,7 +26,7 @@ class AuthServiceImpl @Autowired constructor(
                 ?: throw UserNotFoundByEmailException(dto.email)
 
         if(!passwordHelper.checkPassword(dto.password, user.password))
-            throw RuntimeException("password")
+            throw InvalidPasswordException()
 
         val token = UUID.randomUUID().removeHyphens()
 
