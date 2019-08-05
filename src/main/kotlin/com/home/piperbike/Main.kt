@@ -16,6 +16,8 @@ import org.springframework.boot.runApplication
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
+import java.time.ZoneOffset
+import java.util.*
 
 @SpringBootApplication(
         exclude = [
@@ -45,6 +47,7 @@ class Main @Autowired constructor(
 }
 
 fun main(args: Array<String>) {
+    TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))
     try {
         @Suppress("SpreadOperator")
         SpringApplication.run(Main::class.java, *args)
