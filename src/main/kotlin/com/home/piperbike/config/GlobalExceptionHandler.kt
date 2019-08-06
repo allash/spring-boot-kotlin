@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.servlet.HandlerExceptionResolver
@@ -50,6 +51,18 @@ class GlobalExceptionHandler @Autowired constructor(
     ])
     fun handleWrappedException(ex: Throwable, request: HttpServletRequest, response: HttpServletResponse) {
         handleExceptionCause(ex, request, response)
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException, response: HttpServletResponse) {
+        val status = HttpStatus.UNPROCESSABLE_ENTITY
+        val fieldErrors = ex.bindingResult.fieldErrors.map { error ->
+            error.field to error.defaultMessage
+        }.toMap()
+        return sendErrorResponse(ex, response, status,
+                DtoError(ErrorMessage(
+                        message = "validation_failed", fieldErrors = fieldErrors
+                ), status), logType = ErrorLogType.MESSAGE_ONLY)
     }
 
     // UNCAUGHT EXCEPTION FALLBACK
@@ -108,7 +121,7 @@ class GlobalExceptionHandler @Autowired constructor(
         val cause = ex.cause ?: return sendErrorResponse(ex, response, HttpStatus.INTERNAL_SERVER_ERROR)
         when {
             cause !is Exception -> handleUncaughtException(cause, response)
-            isWrappedException(cause) -> handleExceptionCause(cause, request, response) // Recursively unwrap the cause chain
+            isWrappedException(cause) -> handleExceptionCause(cause, request, response)
             else -> errorResolver.resolveException(request, response, null, cause)
         }
     }
