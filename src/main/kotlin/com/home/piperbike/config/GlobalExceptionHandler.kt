@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.home.piperbike.api.shared.exception.EntityNotFoundException
 import com.home.piperbike.api.shared.exception.ServiceException
 import com.home.piperbike.api.shared.dto.DtoError
+import com.home.piperbike.api.shared.exception.auth.LoginRequiredException
+import com.home.piperbike.api.shared.exception.auth.UserAccessDeniedException
 import com.home.piperbike.api.shared.i18n.ErrorMessage
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,6 +43,24 @@ class GlobalExceptionHandler @Autowired constructor(
     ])
     fun handleNotFound(ex: Throwable, response: HttpServletResponse) {
         sendErrorResponse(ex, response, HttpStatus.NOT_FOUND)
+    }
+
+    // 401 - UNAUTHORIZED
+
+    @ExceptionHandler(value = [
+        LoginRequiredException::class
+    ])
+    fun handleUnauthorizedMessageOnly(ex: Throwable, response: HttpServletResponse) {
+        sendErrorResponse(ex, response, HttpStatus.UNAUTHORIZED, ErrorLogType.MESSAGE_ONLY)
+    }
+
+    // 403 - FORBIDDEN
+
+    @ExceptionHandler(value = [
+        UserAccessDeniedException::class
+    ])
+    fun handleForbidden(ex: Throwable, response: HttpServletResponse) {
+        sendErrorResponse(ex, response, HttpStatus.FORBIDDEN)
     }
 
     // EDGE CASES

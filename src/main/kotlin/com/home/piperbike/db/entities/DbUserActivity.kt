@@ -7,8 +7,8 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "\"activity\"", schema = BaseEntity.PUBLIC_SCHEMA_NAME)
-class DbActivity : BaseEntity() {
+@Table(name = "\"user_activity\"", schema = BaseEntity.PUBLIC_SCHEMA_NAME)
+class DbUserActivity : BaseEntity() {
 
     @Id
     @Column(name = "id", updatable = false)

@@ -1,5 +1,6 @@
 package com.home.piperbike.db.entities
 
+import com.home.piperbike.auth.Role
 import com.home.piperbike.db.DbHelper
 import com.home.piperbike.db.entities.base.BaseEntity
 import com.home.piperbike.db.entities.base.BaseEntity.Companion.PUBLIC_SCHEMA_NAME
@@ -30,8 +31,7 @@ class DbUser : BaseEntity() {
     @Column(name = "password")
     lateinit var password: String
 
-    val fullName: String
-        get() {
-            return "$lastName, $firstName"
-        }
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    lateinit var role: Role
 }
