@@ -25,7 +25,7 @@ class FixtureLoaderImpl @Autowired constructor(
         fixtures.createSession(user)
 
         (0..50).forEach { _ ->
-            fixtures.createActivity(user = user)
+            fixtures.createUserActivity(user = user)
         }
     }
 }

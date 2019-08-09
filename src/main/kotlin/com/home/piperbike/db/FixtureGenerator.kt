@@ -1,10 +1,11 @@
 package com.home.piperbike.db
 
 import com.github.javafaker.Faker
-import com.home.piperbike.db.entities.DbActivity
+import com.home.piperbike.auth.Role
+import com.home.piperbike.db.entities.DbUserActivity
 import com.home.piperbike.db.entities.DbSession
 import com.home.piperbike.db.entities.DbUser
-import com.home.piperbike.db.repositories.ActivityRepository
+import com.home.piperbike.db.repositories.UserActivityRepository
 import com.home.piperbike.db.repositories.SessionRepository
 import com.home.piperbike.db.repositories.UserRepository
 import com.home.piperbike.helper.PasswordHelper
@@ -19,7 +20,7 @@ import java.util.*
 class FixtureGenerator @Autowired constructor(
         private val userRepo: UserRepository,
         private val sessionRepo: SessionRepository,
-        private val activityRepository: ActivityRepository,
+        private val userActivityRepo: UserActivityRepository,
         private val passwordHelper: PasswordHelper
 ) {
 
@@ -32,12 +33,14 @@ class FixtureGenerator @Autowired constructor(
             firstName: String = faker.name().firstName(),
             lastName: String = faker.name().lastName(),
             email: String = "$firstName.$lastName@mail.com",
-            password: String = "asdf"
+            password: String = "asdf",
+            role: Role = Role.USER
     ): DbUser {
         return DbUser().let { user ->
             user.email = email
             user.firstName = firstName
             user.lastName = lastName
+            user.role = role
             user.password = passwordHelper.hashPassword(password)
             userRepo.save(user)
         }
@@ -54,21 +57,21 @@ class FixtureGenerator @Autowired constructor(
         }
     }
 
-    fun createActivity(
+    fun createUserActivity(
             name: String = faker.food().spice(),
             description: String? = faker.lorem().paragraph(100),
             distance: Float? = faker.number().numberBetween(1, 1000).toFloat(),
             elapsedTime: Int? = faker.number().numberBetween(100, 10000),
             user: DbUser
-    ): DbActivity {
-        return DbActivity().let { activity ->
+    ): DbUserActivity {
+        return DbUserActivity().let { activity ->
             activity.name = name
             activity.description = description
             activity.distance = distance
             activity.elapsedTime = elapsedTime
             activity.user = user
             activity.userId = user.id
-            activityRepository.save(activity)
+            userActivityRepo.save(activity)
         }
     }
 }

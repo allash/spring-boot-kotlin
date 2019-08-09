@@ -1,5 +1,6 @@
 package com.home.piperbike
 
+import org.springframework.data.repository.CrudRepository
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -121,3 +122,5 @@ fun KFunction<*>.getUrl(pathVariables: Map<String, Any?> = emptyMap(), queryPara
 
     return result
 }
+
+fun <T, ID> CrudRepository<T, ID>.findOne(id: ID): T? = this.findById(id).orElse(null)
