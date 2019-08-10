@@ -39,10 +39,10 @@ jobs:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:4005 -timeout 1m
 
-      - run: gradle test
+      #- run: gradle test
 
       - persist_to_workspace:
-          root: ~/piperbike
+          root: ~/workspace
           paths:
             - piperbike
 
@@ -58,8 +58,10 @@ jobs:
     steps:
       - checkout
 
+      - run: mkdir -p /home/circleci/workspace
+
       - attach_workspace:
-          at: /home/circleci/piperbike
+          at: /home/circleci/workspace
 
       - setup_remote_docker
 
@@ -67,7 +69,7 @@ jobs:
           name: Deploying
           command: |
 
-            cd /home/circleci/piperbike
+            cd /home/circleci/workspace/piperbike
             wget "https://cli-assets.heroku.com/heroku-linux-x64.tar.gz"
             tar xzf heroku-linux-x64.tar.gz
             HEROKU="/home/circleci/piperbike/heroku/bin/heroku"
