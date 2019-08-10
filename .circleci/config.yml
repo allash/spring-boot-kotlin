@@ -40,7 +40,7 @@ jobs:
           command: dockerize -wait tcp://localhost:4005 -timeout 1m
 
       #- run: gradle test
-      - run: ./gradlew --offline build -x test
+      - run: ./gradlew build -x test
 
       - persist_to_workspace:
           root: ~/piperbike
