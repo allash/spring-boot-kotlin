@@ -1,9 +1,8 @@
 version: 2
 jobs:
-  build:
+  backend_build:
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:11-jdk
 
       - image: postgres:9.6.8
         command: postgres -p 4005
@@ -12,7 +11,7 @@ jobs:
           - POSTGRES_PASSWORD=piperbike
           - POSTGRES_DB=piperbike_test
 
-    working_directory: ~/repo
+    working_directory: ~/piperbike
 
     environment:
       # Customize the JVM maximum heap limit
@@ -36,4 +35,73 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:4005 -timeout 1m
+
       - run: gradle test
+
+      - persist_to_workspace:
+          root: ~/piperbike
+          paths:
+            - piperbike
+
+  backend_deploy:
+    build:
+      machine: true
+
+    docker:
+      - image: circleci/openjdk:11-jdk
+
+    working_directory: ~/piperbike
+
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: /home/circleci/piperbike
+
+      - setup_remote_docker
+
+      - run:
+          name: Deploying
+          command: |
+
+            cd /home/circleci/piperbike
+            wget "https://cli-assets.heroku.com/heroku-linux-x64.tar.gz"
+            tar xzf heroku-linux-x64.tar.gz
+            HEROKU="/home/circleci/piperbike/heroku/bin/heroku"
+
+            echo "Build docker"
+            docker build -t piperbike_server .
+
+            export HEROKU_APP="piperbike"
+
+            if [[ ! -z "$HEROKU_APP" ]]; then
+
+              echo "Will deploy to $HEROKU_APP"
+              docker tag piperbike_server registry.heroku.com/$HEROKU_APP/web
+
+              echo "container login"
+              $HEROKU container:login
+
+              echo "docker push"
+              docker push registry.heroku.com/$HEROKU_APP/web
+
+              echo "container release"
+              $HEROKU container:release web
+
+            fi
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - backend_build
+      - backend_deploy:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - backend_build
