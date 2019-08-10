@@ -40,6 +40,7 @@ jobs:
           command: dockerize -wait tcp://localhost:4005 -timeout 1m
 
       #- run: gradle test
+      - run: ./gradlew --offline build -x test
 
       - persist_to_workspace:
           root: ~/piperbike
@@ -74,8 +75,8 @@ jobs:
             tar xzf heroku-linux-x64.tar.gz
             HEROKU="/home/circleci/piperbike/heroku/bin/heroku"
 
-            echo "Build docker"
-            docker build -t piperbike_server .
+            echo "Building docker image"
+            docker build -t piperbike_server . >> /dev/null
 
             export HEROKU_APP="piperbike"
 
