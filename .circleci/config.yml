@@ -42,9 +42,9 @@ jobs:
       #- run: gradle test
 
       - persist_to_workspace:
-          root: ~/workspace
+          root: ~/piperbike
           paths:
-            - piperbike
+            - .
 
   backend_deploy:
     build:
@@ -58,10 +58,10 @@ jobs:
     steps:
       - checkout
 
-      - run: mkdir -p /home/circleci/workspace
+      - run: mkdir -p /home/circleci/piperbike
 
       - attach_workspace:
-          at: /home/circleci/workspace
+          at: /home/circleci/piperbike
 
       - setup_remote_docker
 
@@ -69,7 +69,7 @@ jobs:
           name: Deploying
           command: |
 
-            cd /home/circleci/workspace/piperbike
+            cd /home/circleci/piperbike
             wget "https://cli-assets.heroku.com/heroku-linux-x64.tar.gz"
             tar xzf heroku-linux-x64.tar.gz
             HEROKU="/home/circleci/piperbike/heroku/bin/heroku"
