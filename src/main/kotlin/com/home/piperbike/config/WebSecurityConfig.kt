@@ -48,7 +48,8 @@ class WebSecurityConfig @Autowired constructor(
                 }
 
         val whiteListedResources = listOf(
-                AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.name, true)
+                AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.name, true),
+                AntPathRequestMatcher("/api/debug/ping", HttpMethod.GET.name, true)
         )
 
         http.authorizeRequests()
