@@ -1,9 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
-import java.nio.file.Files
-import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
-
 buildscript {
     ext {
         kotlinVersion = '1.3.31'
@@ -40,7 +34,7 @@ buildscript {
     }
 }
 
-group 'io.e-complete.app'
+group 'com.piperbike.app'
 version '0.1.0'
 
 apply plugin: 'kotlin'
@@ -102,20 +96,19 @@ dependencies {
     compile group: 'org.reflections', name: 'reflections', version: reflectionsVersion
     compile group: 'org.hibernate', name: 'hibernate-java8', version: hibernateVersion
 
-    compile group: 'org.json', name: 'json', version: '20180813' // Spring boot 2.1.5.RELEASE is missing this dep, might be removable with a later version
+    compile group: 'org.json', name: 'json', version: '20180813' 
 
     compile group: 'com.github.javafaker', name: 'javafaker', version: '0.18'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
     testCompile group: 'org.springframework.security', name: 'spring-security-test', version: springSecurityVersion
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0' // 3.12.x has a different API
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0' 
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
 }
 
 compileJava.dependsOn(processResources)
 
 configurations {
-    //all*.exclude group: 'joda-time' //maybe required by aws later
     all*.exclude group: 'com.vaadin.external.google', module: 'android-json'
 }
 
@@ -151,7 +144,7 @@ allOpen {
 }
 
 springBoot {
-    mainClassName = "net.home.piperbike.MainKt"
+    mainClassName = "com.home.piperbike.MainKt"
 }
 
 bootJar {
@@ -169,4 +162,19 @@ task resolveAllDependencies {
         }
     }
 }
+
+task buildDocker(type: Docker, dependsOn: build) {
+    push = false
+    tag = 'piperbike-backend'
+    tagVersion = 'latest'
+    applicationName = jar.archiveBaseName
+    dockerfile = file('./Dockerfile')
+    doFirst {
+        copy {
+            from "build/libs"
+            into stageDir
+        }
+    }
+}
+
 
