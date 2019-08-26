@@ -35,4 +35,10 @@ class DbUserActivity : BaseEntity() {
 
     @Column(name = "user_id", updatable = false, insertable = false)
     lateinit var userId: UUID
+
+    @Column(name = "max_speed")
+    var maxSpeed: Float? = null
+
+    @Column(name = "avg_speed")
+    var avgSpeed: Float? = null
 }

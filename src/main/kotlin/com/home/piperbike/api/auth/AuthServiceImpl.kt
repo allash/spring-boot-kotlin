@@ -1,17 +1,20 @@
 package com.home.piperbike.api.auth
 
-import com.home.piperbike.api.auth.dto.request.DtoLoginRequest
+import com.home.piperbike.api.auth.dto.request.DtoAuthLoginRequest
+import com.home.piperbike.api.auth.dto.request.DtoAuthRegisterRequest
 import com.home.piperbike.api.auth.dto.response.DtoLoginResponse
 import com.home.piperbike.api.shared.exception.user.InvalidPasswordException
+import com.home.piperbike.api.shared.exception.user.UserAlreadyExistsByEmailException
 import com.home.piperbike.api.shared.exception.user.UserNotFoundByEmailException
 import com.home.piperbike.db.entities.DbSession
+import com.home.piperbike.db.entities.DbUser
 import com.home.piperbike.db.repositories.SessionRepository
 import com.home.piperbike.db.repositories.UserRepository
 import com.home.piperbike.helper.PasswordHelper
+import com.home.piperbike.ifNotNull
 import com.home.piperbike.removeHyphens
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.lang.RuntimeException
 import java.util.*
 
 @Service
@@ -21,11 +24,11 @@ class AuthServiceImpl @Autowired constructor(
         private val passwordHelper: PasswordHelper
 ) : AuthService {
 
-    override fun login(dto: DtoLoginRequest): DtoLoginResponse {
-        val user = userRepo.findOneByEmail(dto.email)
-                ?: throw UserNotFoundByEmailException(dto.email)
+    override fun login(body: DtoAuthLoginRequest): DtoLoginResponse {
+        val user = userRepo.findOneByEmail(body.email)
+                ?: throw UserNotFoundByEmailException(body.email)
 
-        if(!passwordHelper.checkPassword(dto.password, user.password))
+        if(!passwordHelper.checkPassword(body.password, user.password))
             throw InvalidPasswordException()
 
         val token = UUID.randomUUID().removeHyphens()
@@ -39,5 +42,18 @@ class AuthServiceImpl @Autowired constructor(
         }
 
         return DtoLoginResponse(token = token)
+    }
+
+    override fun register(body: DtoAuthRegisterRequest) {
+        userRepo.findOneByEmail(body.email)
+                .ifNotNull { throw UserAlreadyExistsByEmailException(body.email)  }
+
+        DbUser().also { user ->
+            user.firstName = body.firstName
+            user.lastName = body.lastName
+            user.email = body.email
+            user.password = passwordHelper.hashPassword(password = body.password)
+            userRepo.save(user)
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.home.piperbike.test.integration.auth
 
 import com.home.piperbike.api.auth.AuthController
-import com.home.piperbike.api.auth.dto.request.DtoLoginRequest
+import com.home.piperbike.api.auth.dto.request.DtoAuthLoginRequest
 import com.home.piperbike.api.auth.dto.response.DtoLoginResponse
 import com.home.piperbike.api.shared.exception.user.InvalidPasswordException
 import com.home.piperbike.api.shared.exception.user.UserNotFoundByEmailException
@@ -23,15 +23,15 @@ class AuthLoginTest : BaseControllerTest(AuthController::login) {
     @Autowired
     private lateinit var sessionRepository: SessionRepository
 
-    private fun buildRequest(body: DtoLoginRequest): MockHttpServletRequestBuilder =
+    private fun buildRequest(body: DtoAuthLoginRequest): MockHttpServletRequestBuilder =
             testTarget.post(body = body)
 
-    class AuthContext(val user: DbUser, val body: DtoLoginRequest)
+    class AuthContext(val user: DbUser, val body: DtoAuthLoginRequest)
 
     private val validContext = {
         val password = "asdf"
         val user = fixtures.createUser(password = password)
-        val body = DtoLoginRequest(
+        val body = DtoAuthLoginRequest(
                 email = user.email,
                 password = password
         )

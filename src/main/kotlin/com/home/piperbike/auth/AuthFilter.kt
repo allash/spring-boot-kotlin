@@ -8,6 +8,7 @@ import com.home.piperbike.db.repositories.SessionRepository
 import com.home.piperbike.db.repositories.UserRepository
 import com.home.piperbike.findOne
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -45,13 +46,15 @@ class AuthFilter @Autowired constructor(
 
     private fun createTokenAuthentication(token: String, user: DbUser): TokenAuthentication = TokenAuthentication(token)
             .let { authentication ->
-                authentication.principal = DtoSession(
+                val dtoSession = DtoSession(
                         token = token,
                         user = DtoSession.DtoSessionUser(
                                 id = user.id,
                                 rights = user.role.rights.toList()
                         ))
+                authentication.principal = dtoSession
                 authentication.isAuthenticated = true
+                dtoSession.user.rights.mapTo(authentication.authorities) { SimpleGrantedAuthority(it) }
                 authentication
             }
 

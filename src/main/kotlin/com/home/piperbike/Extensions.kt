@@ -123,4 +123,10 @@ fun KFunction<*>.getUrl(pathVariables: Map<String, Any?> = emptyMap(), queryPara
     return result
 }
 
+fun <T> T?.ifNotNull(op: () -> Unit) {
+    if (this != null) {
+        op()
+    }
+}
+
 fun <T, ID> CrudRepository<T, ID>.findOne(id: ID): T? = this.findById(id).orElse(null)
