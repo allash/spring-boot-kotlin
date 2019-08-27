@@ -6,6 +6,7 @@ class Localization {
             const val USER_NOT_FOUND_BY_EMAIL = "USER_NOT_FOUND_BY_EMAIL"
             const val LOGIN_REQUIRED = "LOGIN_REQUIRED"
             const val USER_ACTIVITY_NOT_FOUND_BY_ID = "USER_ACTIVITY_NOT_FOUND_BY_ID"
+            const val USER_ALREADY_EXISTS_BY_EMAIL = "USER_ALREADY_EXISTS_BY_EMAIL"
         }
     }
 }

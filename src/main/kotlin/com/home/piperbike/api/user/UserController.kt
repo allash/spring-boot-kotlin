@@ -15,4 +15,7 @@ class UserController @Autowired constructor(
 
     @GetMapping
     fun getUsers(): List<DtoGetUserResponse> = userService.getUsers()
+
+    @GetMapping("/profile")
+    fun getUser(): DtoGetUserResponse = userService.getUser()
 }

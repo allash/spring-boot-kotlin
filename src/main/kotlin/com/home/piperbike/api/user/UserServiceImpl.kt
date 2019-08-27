@@ -16,6 +16,11 @@ class UserServiceImpl @Autowired constructor(
     }
 
     override fun createUser() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
+    }
+
+    override fun getUser(): DtoGetUserResponse {
+        return userRepo.expectCurrentUser()
+                .let { mapper.toDtoGetUserResponse(it) }
     }
 }
